@@ -1,7 +1,8 @@
 const express = require('express');
+const router = express.Router();
+const auth = require('../middleware/auth');
 const Quiz = require('../models/quiz');
 const quizCtrl = require('../controllers/quiz');
-const router = express.Router();
 
 router.get('/random', async (req, res) => {
   try {

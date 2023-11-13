@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const config = require('./config');
 const quizRoutes = require('./routes/quiz');
+const userRoutes = require('./routes/user');
 const app = express();
 
 mongoose.connect(config.mongoURI,
@@ -22,5 +23,6 @@ app.use(express.json());
 
 
 app.use('/api/quiz', quizRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
