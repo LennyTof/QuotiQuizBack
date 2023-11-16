@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Score = require('../models/score');
+const user = require('../models/user');
 
 exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
@@ -88,4 +90,25 @@ exports.deleteUser = (req, res, next) => {
   User.findByIdAndDelete(userId)
     .then(() => res.status(200).json({ message: "Compte supprimé"}))
     .catch(error => res.status(400).json({ error }));
+};
+
+exports.saveUserScore = (req, res, next) => {
+  const token = req.headers.authorization.split(' ')[1];
+
+  const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+  const userId = decodedToken.userId;
+  const { score } = req.body;
+
+  const newScore = new Score({
+    value: score,
+    user: userId,
+  });
+  newScore.save()
+    .then(() => {
+      res.status(200).json({ message: 'Nouveau score enregistré !'});
+    })
+    .catch(error => {
+      res.status(500).json({ error });
+    });
+
 };

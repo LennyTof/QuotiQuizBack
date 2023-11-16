@@ -9,4 +9,6 @@ router.post('/login', userCtrl.login);
 router.put('/update/:userId', userCtrl.updateUser);
 router.delete('/:id', userCtrl.deleteUser);
 
+router.post('/score', userCtrl.saveUserScore);
+
 module.exports = router;
