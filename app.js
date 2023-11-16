@@ -1,6 +1,8 @@
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const config = require('./config');
+const cors = require('cors');
 const quizRoutes = require('./routes/quiz');
 const userRoutes = require('./routes/user');
 const app = express();
@@ -11,6 +13,7 @@ mongoose.connect(config.mongoURI,
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -18,11 +21,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cors({
+  origin: 'http://localhost:3001',
+  credentials: true,
+}));
+
 app.use(express.json());
 
-
-
 app.use('/api/quiz', quizRoutes);
-app.use('/api/auth', userRoutes);
+app.use('/api/user', userRoutes);
 
 module.exports = app;
