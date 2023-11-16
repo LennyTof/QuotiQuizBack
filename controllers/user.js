@@ -63,26 +63,32 @@ exports.updateUser = (req, res, next) => {
     });
 };
 
-exports.findOneUser = (req, res, next) => {
-  const token = req.headers.authorization.split(' ')[1];
-
-  jwt.verify(token, 'RANDOM_TOKEN_SECRET', (err, decodedToken) => {
-    if (err) {
-      return res.status(401).json({ error: 'Token invalide' });
-    }
+exports.findOneUser = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     const userId = decodedToken.userId;
-    User.findOne({ _id: userId })
-      .then(user => {
-        if (user) {
-          res.status(200).json(user);
-        } else {
-          res.status(404).json({ error: 'Utilisateur non trouvé' });
-        }
-      })
-      .catch(error => {
-        res.status(500).json({ error: error.message });
-      });
-  });
+
+    const user = await User.findById(userId).populate('scores');
+
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    const userWithScores = {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      scores: user.scores.map(score => ({
+        value: score.value,
+        date: score.date 
+      }))
+    };
+
+    res.status(200).json(userWithScores);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 exports.deleteUser = (req, res, next) => {
@@ -92,23 +98,26 @@ exports.deleteUser = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 };
 
-exports.saveUserScore = (req, res, next) => {
-  const token = req.headers.authorization.split(' ')[1];
+exports.saveUserScore = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    const userId = decodedToken.userId;
+    const { score } = req.body;
+    const user = await User.findById(userId)
 
-  const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-  const userId = decodedToken.userId;
-  const { score } = req.body;
-
-  const newScore = new Score({
-    value: score,
-    user: userId,
-  });
-  newScore.save()
-    .then(() => {
-      res.status(200).json({ message: 'Nouveau score enregistré !'});
-    })
-    .catch(error => {
-      res.status(500).json({ error });
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' })
+    };
+    const newScore = new Score({
+      value: score,
+      user: userId,
     });
-
+    await newScore.save()
+    user.scores.push(newScore);
+    await user.save();
+    res.status(200).json({ message: 'Nouveau score enregistré !'});
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 };
