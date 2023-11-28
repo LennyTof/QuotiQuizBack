@@ -15,7 +15,7 @@ router.get('/random', async (req, res) => {
     res.json(randomQuiz[0]);
   } catch (error) {
     console.error("Erreur durant la récupération du Quiz aléatoire :", error);
-    res.status(500).json({ error: "Impossiblie de récupérer un quiz"});
+    res.status(500).json({ error: "Impossible de récupérer un quiz"});
   };
 });
 
