@@ -50,9 +50,18 @@ exports.findAllUser = (req, res, next) => {
    .catch(error => res.status(400).json({error}));
 };
 
-exports.updateUser = (req, res, next) => {
+exports.updateUser = async (req, res, next) => {
   const userId = req.params.userId;
-  const updateFields = req.body;
+  let updateFields = req.body;
+
+  if (updateFields.password) {
+    try {
+      const hashedPassword = await bcrypt.hash(updateFields.password, 10);
+      updateFields.password = hashedPassword
+    } catch (error) {
+      return res.status(500).json({ error });
+    }
+  }
 
   User.findByIdAndUpdate(userId, { $set: updateFields }, { new: true })
     .then(updateUser => {
@@ -81,7 +90,7 @@ exports.findOneUser = async (req, res, next) => {
       username: user.username,
       scores: user.scores.map(score => ({
         value: score.value,
-        date: score.date 
+        date: score.date
       }))
     };
 
