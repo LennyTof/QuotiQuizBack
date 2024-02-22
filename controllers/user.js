@@ -5,18 +5,25 @@ const Score = require('../models/score');
 const user = require('../models/user');
 
 exports.signup = (req, res, next) => {
-  bcrypt.hash(req.body.password, 10)
-    .then(hash => {
-      const user = new User({
-        email: req.body.email,
-        username: req.body.username,
-        password: hash
-      });
-      user.save()
-        .then(() => res.status(201).json({ message: "utilisateur créé !" }))
-        .catch(error => res.status(400).json({ error }));
-    })
-    .catch(error => res.status(500).json({ error }));
+  let { password, passwordConfirmation, ...updateFields } = req.body;
+  const isMatch = password === passwordConfirmation
+
+  if (isMatch) {
+    bcrypt.hash(req.body.password, 10)
+      .then(hash => {
+        const user = new User({
+          email: req.body.email,
+          username: req.body.username,
+          password: hash
+        });
+        user.save()
+          .then(() => res.status(201).json({ message: "utilisateur créé !" }))
+          .catch(error => res.status(400).json({ error }));
+      })
+      .catch(error => res.status(500).json({ error }));
+  } else {
+    return res.status(401).json({ message: 'Les mot de passe sont différents'});
+  }
 };
 
 exports.login = (req, res, next) => {
