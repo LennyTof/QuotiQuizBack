@@ -52,11 +52,16 @@ exports.findAllUser = (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
   const userId = req.params.userId;
-  let updateFields = req.body;
+  let { password, oldPassword, ...updateFields } = req.body;
 
-  if (updateFields.password) {
+  if (password && oldPassword) {
     try {
-      const hashedPassword = await bcrypt.hash(updateFields.password, 10);
+      const user = await User.findById(userId);
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message : "L'ancien mot de passe est incorrect."})
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
       updateFields.password = hashedPassword
     } catch (error) {
       return res.status(500).json({ error });
