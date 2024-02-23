@@ -10,5 +10,6 @@ router.put('/update/:userId', userCtrl.updateUser);
 router.delete('/:id', userCtrl.deleteUser);
 
 router.post('/score', userCtrl.saveUserScore);
+router.get('/daily-leaderboard', userCtrl.getDailyScores);
 
 module.exports = router;

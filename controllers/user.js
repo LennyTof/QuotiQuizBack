@@ -142,3 +142,23 @@ exports.saveUserScore = async (req, res, next) => {
     res.status(500).json({ error });
   }
 };
+
+exports.getDailyScores = async (req, res) => {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  try {
+    const dailyScores = await Score.find({
+      date: { $gte: startOfDay, $lt: endOfDay }
+    })
+    .populate('user', 'username')
+    .sort({ value: -1 })
+    .exec();
+    res.json(dailyScores);
+  }catch (error) {
+    res.status(500).json({ message: "Erreur lors de la récupération des scores journaliers", error: error});
+  }
+};
