@@ -19,11 +19,17 @@ router.get('/random', async (req, res) => {
   };
 });
 
+// routes pour les questions proposées par les utilisateurs
+router.get('/asked', quizCtrl.findAllAskedQuiz);
+router.post('/asked', quizCtrl.createAskedQuiz);
+router.get('/asked/:id', quizCtrl.findOneAskedQuiz);
+router.delete('/asked/:id', quizCtrl.deleteAskedQuiz);
+router.put('/asked/:id', quizCtrl.updateAskedQuiz);
+
 router.get('/', quizCtrl.findAllQuiz);
 router.post('/', quizCtrl.createQuiz);
 router.get('/:id', quizCtrl.findOneQuiz);
 router.delete('/:id', quizCtrl.deleteQuiz);
 router.put('/:id', quizCtrl.updateQuiz);
-
 
 module.exports = router;
