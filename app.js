@@ -6,6 +6,8 @@ const cors = require('cors');
 const quizRoutes = require('./routes/quiz');
 const userRoutes = require('./routes/user');
 const app = express();
+const router = express.Router();
+
 
 mongoose.connect(config.mongoURI,
   { useNewUrlParser: true,
@@ -28,7 +30,9 @@ app.use(cors({
 
 app.use(express.json());
 
+
 app.use('/api/quiz', quizRoutes);
 app.use('/api/user', userRoutes);
+
 
 module.exports = app;

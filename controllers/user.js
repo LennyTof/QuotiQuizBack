@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Score = require('../models/score');
-const user = require('../models/user');
+
 
 exports.signup = (req, res, next) => {
   let { password, passwordConfirmation, ...updateFields } = req.body;
@@ -40,6 +40,7 @@ exports.login = (req, res, next) => {
           res.status(200).json({
             userId: user._id,
             username: user.username,
+            roles: user.roles,
             token: jwt.sign(
               { userId: user._id },
               'RANDOM_TOKEN_SECRET',
@@ -101,6 +102,7 @@ exports.findOneUser = async (req, res, next) => {
       _id: user._id,
       email: user.email,
       username: user.username,
+      roles: user.roles,
       scores: user.scores.map(score => ({
         value: score.value,
         date: score.date

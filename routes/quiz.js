@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 const Quiz = require('../models/quiz');
 const quizCtrl = require('../controllers/quiz');
 
@@ -20,16 +21,16 @@ router.get('/random', async (req, res) => {
 });
 
 // routes pour les questions proposées par les utilisateurs
-router.get('/asked', quizCtrl.findAllAskedQuiz);
+router.get('/asked', auth, isAdmin, quizCtrl.findAllAskedQuiz);
 router.post('/asked', quizCtrl.createAskedQuiz);
 router.get('/asked/:id', quizCtrl.findOneAskedQuiz);
-router.delete('/asked/:id', quizCtrl.deleteAskedQuiz);
+router.delete('/asked/:id', auth, isAdmin, quizCtrl.deleteAskedQuiz);
 router.put('/asked/:id', quizCtrl.updateAskedQuiz);
 
-router.get('/', quizCtrl.findAllQuiz);
-router.post('/', quizCtrl.createQuiz);
+router.get('/', auth, isAdmin, quizCtrl.findAllQuiz);
+router.post('/', auth, isAdmin, quizCtrl.createQuiz);
 router.get('/:id', quizCtrl.findOneQuiz);
-router.delete('/:id', quizCtrl.deleteQuiz);
-router.put('/:id', quizCtrl.updateQuiz);
+router.delete('/:id', auth, isAdmin, quizCtrl.deleteQuiz);
+router.put('/:id', auth, isAdmin, quizCtrl.updateQuiz);
 
 module.exports = router;
