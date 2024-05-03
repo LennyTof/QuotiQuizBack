@@ -130,7 +130,6 @@ exports.saveUserScore = async (req, res, next) => {
     const userId = decodedToken.userId;
     const { score, quizDetails } = req.body;
     const user = await User.findById(userId)
-    console.log(req.body)
 
     if (!user) {
       return res.status(404).json({ error: 'Utilisateur non trouvé' })
