@@ -105,7 +105,8 @@ exports.findOneUser = async (req, res, next) => {
       roles: user.roles,
       scores: user.scores.map(score => ({
         value: score.value,
-        date: score.date
+        date: score.date,
+        quizDetails: score.quizDetails
       }))
     };
 
@@ -127,8 +128,9 @@ exports.saveUserScore = async (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     const userId = decodedToken.userId;
-    const { score } = req.body;
+    const { score, quizDetails } = req.body;
     const user = await User.findById(userId)
+    console.log(req.body)
 
     if (!user) {
       return res.status(404).json({ error: 'Utilisateur non trouvé' })
@@ -136,6 +138,7 @@ exports.saveUserScore = async (req, res, next) => {
     const newScore = new Score({
       value: score,
       user: userId,
+      quizDetails: quizDetails
     });
     await newScore.save()
     user.scores.push(newScore);

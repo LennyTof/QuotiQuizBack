@@ -13,8 +13,12 @@ const scoreSchema = mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
-  }
+  },
+  quizDetails: [{
+    question: String,
+    userAnswer: String,
+    correctAnswer: String
+  }]
 });
 
 module.exports = mongoose.model('Score', scoreSchema);
-
