@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Score = require('../models/score');
+const mailer = require('../config/mailer');
 
 
 exports.signup = (req, res, next) => {
@@ -167,3 +168,63 @@ exports.getDailyScores = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des scores journaliers", error: error});
   }
 };
+
+exports.sendResetPasswordEmail = async (req, res) => {
+  try {
+    const user = await User.findOne({ email:req.body.email });
+    if (!user) {
+      return res.status(404).send({ message: "Aucun utilisateur trouvé avec cet email."});
+    }
+
+    function generateOTP() {
+      const otpLength = 6;
+      let newOtp = '';
+      for(let i = 0; i < otpLength; i++) {
+        newOtp += Math.floor(Math.random() * 10);
+      }
+      return newOtp
+    }
+
+    const otp = generateOTP();
+    user.resetPasswordToken = otp;
+    user.resetPasswordExpires = Date.now() + 3600000;
+    await user.save()
+
+    const mailOptions = {
+      from: process.env.EMAIL_USERNAME,
+      to: user.email,
+      subject: 'Réinitialisation du mot de passe',
+      text: `Votre code de réinitialisation est: ${otp}`
+    };
+
+    await mailer.sendMail(mailOptions);
+
+    res.status(200).send({ message: "Email envoyé."})
+  } catch (error) {
+    res.status(500).send({ message: "Erreur serveur", error });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).send({ message: "Token non valide ou expiré." });
+    };
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save()
+
+    res.status(200).send({ message: "Mot de passe réinitialisé avec succès." });
+  } catch (error) {
+    res.status(500).send({ message: "Erreur serveur", error });
+  }
+}

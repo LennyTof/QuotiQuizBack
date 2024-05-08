@@ -12,4 +12,7 @@ router.delete('/:id', userCtrl.deleteUser);
 router.post('/score', userCtrl.saveUserScore);
 router.get('/daily-leaderboard', userCtrl.getDailyScores);
 
+router.post('/reset-password-email', userCtrl.sendResetPasswordEmail);
+router.post('/reset-password', userCtrl.resetPassword);
+
 module.exports = router;

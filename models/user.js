@@ -6,7 +6,9 @@ const userSchema = mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   roles: { type: String, default: 'user'},
-  scores: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Score'}]
+  scores: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Score'}],
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null }
 });
 
 userSchema.plugin(uniqueValidator);
