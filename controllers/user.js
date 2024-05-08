@@ -191,7 +191,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
     await user.save()
 
     const mailOptions = {
-      from: process.env.EMAIL_USERNAME,
+      from: process.env.SENDINBLUE_USER,
       to: user.email,
       subject: 'Réinitialisation du mot de passe',
       text: `Votre code de réinitialisation est: ${otp}`
@@ -201,6 +201,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
 
     res.status(200).send({ message: "Email envoyé."})
   } catch (error) {
+    console.error('Error in sendResetPasswordEmail:', error)
     res.status(500).send({ message: "Erreur serveur", error });
   }
 };
