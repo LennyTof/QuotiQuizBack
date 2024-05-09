@@ -4,7 +4,10 @@ const AskedQuiz = require('../models/askedQuiz');
  exports.findAllQuiz = (req, res, next) => {
    Quiz.find()
     .then(quizs => res.status(200).json(quizs))
-    .catch(error => res.status(400).json({error}));
+    .catch(error => {
+      console.error('Erreur lors de la récupération des quiz :', error);
+      res.status(500).json({ message: "Erreur interne du serveur"});
+    });
  };
 
  exports.findOneQuiz = (req, res, next) => {
@@ -16,7 +19,10 @@ const AskedQuiz = require('../models/askedQuiz');
       }
       res.status(200).json(quiz);
     })
-    .catch(error => res.status(400).json({ error }));
+    .catch(error => {
+      console.error("Erreur lors de la recherche d'un quiz :", error);
+      res.status(500).json({ message: "Erreur interne du serveur" });
+    });
  };
 
 exports.createQuiz = (req, res, next) => {
@@ -28,7 +34,10 @@ exports.createQuiz = (req, res, next) => {
   });
   quiz.save()
     .then(() => res.status(201).json({ message: "Question enregistré !"}))
-    .catch(error => res.status(400).json({ error }));
+    .catch(error => {
+      console.error("Erreur lors de la création d'une question :", error);
+      res.status(500).json({ message: "Erreur interne du serveur" });
+    });
 };
 
 exports.updateQuiz = (req, res, next) => {
@@ -45,14 +54,20 @@ exports.updateQuiz = (req, res, next) => {
       }
       res.status(200).json(updateQuiz);
     })
-    .catch(error => res.status(400).json({ error }));
+    .catch(error => {
+      console.error("Erreur lors de la modification d'un quiz :", error);
+      res.status(500).json({ message: "Erreur interne du serveur" });
+    });
 };
 
 exports.deleteQuiz = (req, res, next) => {
   const quizId = req.params.id;
   Quiz.findByIdAndDelete(quizId)
     .then(() => res.status(200).json({ message: "Question supprimé"}))
-    .catch(error => res.status(400).json({ error }));
+    .catch(error => {
+      console.error("Erreur lors de la suppression d'un quiz :", error);
+      res.status(500).json({ message: "Erreur interne du serveur" });
+    });
 };
 
 //méthode pour gérer les questions proposées par les utilisateurs
@@ -85,7 +100,10 @@ exports.createAskedQuiz = (req, res, next) => {
   });
   quiz.save()
     .then(() => res.status(201).json({ message: "Question enregistré !"}))
-    .catch(error => res.status(400).json({ error }));
+    .catch(error => {
+      console.error("Erreur lors de la création d'une question via l'utilisateur", error);
+      res.status(500).json({ message: "Erreur interne du serveur" });
+    });
 };
 
 exports.updateAskedQuiz = (req, res, next) => {
