@@ -8,7 +8,7 @@ const jwtSecret = process.env.JWT_SECRET;
 
 exports.signup = (req, res, next) => {
   const { password, passwordConfirmation, email, username } = req.body;
-  
+
   if (!email || !username || !password || !passwordConfirmation) {
     return res.status(400).json({ message: "Tous les champs sont requis." });
   }
@@ -197,10 +197,10 @@ exports.sendResetPasswordEmail = async (req, res) => {
     await user.save()
 
     const mailOptions = {
-      from: process.env.SENDINBLUE_USER,
+      from: process.env.BREVO_USER,
       to: user.email,
       subject: 'Réinitialisation du mot de passe',
-      text: `Ton code de réinitialisation est: ${otp} ! Utilise le vite avant qu'il ne soit plus utilisable sur QuotiQuiz !`
+      text: `Ton code de réinitialisation est: ${otp} ! Utilise le vite avant qu'il expire sur QuotiQuiz !`
     };
 
     await mailer.sendMail(mailOptions);
