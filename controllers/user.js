@@ -141,6 +141,16 @@ exports.saveUserScore = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ error: 'Utilisateur non trouvé' })
     };
+
+    // si l'utilisateur a plus de 30 scores, supprime le plus ancien
+    if (user.scores.length >= 30) {
+      const oldestScore = user.scores.reduce((oldest, current) => {
+        return new Date(current.date) < new Date(oldest.date) ? current : oldest;
+      });
+      await Score.findByIdAndDelete(oldestScore._id);
+      user.scores = user.scores.filter(score => score._id.toString() !== oldestScore._id.toString());
+    }
+    
     const newScore = new Score({
       value: score,
       user: userId,
