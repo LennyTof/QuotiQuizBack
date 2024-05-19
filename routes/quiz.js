@@ -3,22 +3,40 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 const Quiz = require('../models/quiz');
+const UsedQuiz = require('../models/usedQuiz');
 const quizCtrl = require('../controllers/quiz');
 
-router.get('/random', async (req, res) => {
+router.get('/daily', async (req, res) => {
   try {
-    const randomQuiz = await Quiz.aggregate([{ $sample: { size: 1 } }]);
+    // Récupére tous les quiz utilisés et stock les id
+    const allUsedQuizzes = await UsedQuiz.find({});
+    const usedQuizIds = allUsedQuizzes.flatMap(record => record.quizIds);
 
-    if (!randomQuiz || randomQuiz.length === 0) {
-      return res.status(404).json({ message: "Aucun qui trouvé."});
-    };
+    // Trouve tous les quiz qui n'ont pas leur id stocké
+    const availableQuizzes = await Quiz.find({ _id: { $nin: usedQuizIds } });
 
-    res.json(randomQuiz[0]);
+    if (availableQuizzes.length === 0) {
+      return res.status(404).json({ message: "Tous les quiz disponibles ont été utilisés." });
+    }
+
+    // Choisi un quiz au hasard
+    const randomQuiz = availableQuizzes[Math.floor(Math.random() * availableQuizzes.length)];
+
+    // Ajoute l'ID du quiz sélectionné à l'array des quiz utilisés
+    UsedQuiz.updateOne({}, { $push: { quizIds: randomQuiz._id } }, { upsert: true })
+      .then(() => {
+        res.json(randomQuiz);
+      })
+      .catch(error => {
+        console.error("Erreur lors de l'ajout du quiz utilisé :", error);
+        res.status(500).json({ error: "Impossible d'ajouter le quiz utilisé" });
+      });
   } catch (error) {
-    console.error("Erreur durant la récupération du Quiz aléatoire :", error);
-    res.status(500).json({ error: "Impossible de récupérer un quiz"});
-  };
+    console.error("Erreur durant la récupération du quiz du jour :", error);
+    res.status(500).json({ error: "Impossible de récupérer le quiz du jour" });
+  }
 });
+
 
 // routes pour les questions proposées par les utilisateurs
 router.get('/asked', auth, isAdmin, quizCtrl.findAllAskedQuiz);
