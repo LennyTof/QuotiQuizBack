@@ -17,6 +17,7 @@
     "express-session": "^1.17.3",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.5.45",
     "mongodb": "^6.2.0",
     "mongoose": "^8.0.0",
     "mongoose-unique-validator": "^5.0.0",
