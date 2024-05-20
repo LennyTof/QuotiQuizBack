@@ -15,7 +15,17 @@ router.get('/daily', async (req, res) => {
       return res.status(404).json({ message: "Aucun quiz quotidien disponible." });
     }
 
-    res.json(dailyQuiz.quizIds);
+    const randomQuestionIndex = Math.floor(Math.random() * dailyQuiz.quizIds.length);
+    const randomQuestionId = dailyQuiz.quizIds[randomQuestionIndex];
+
+    // Rechercher la question correspondante dans la base de données
+    const randomQuestion = await Quiz.findById(randomQuestionId);
+
+    if (!randomQuestion) {
+      return res.status(404).json({ message: "Question introuvable dans la base de données." });
+    }
+
+    res.json(randomQuestion);
   } catch (error) {
     console.error("Erreur durant la récupération du quiz du jour :", error);
     res.status(500).json({ error: "Impossible de récupérer le quiz du jour" });
