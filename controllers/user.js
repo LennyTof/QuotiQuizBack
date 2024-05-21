@@ -150,7 +150,7 @@ exports.saveUserScore = async (req, res, next) => {
       await Score.findByIdAndDelete(oldestScore._id);
       user.scores = user.scores.filter(score => score._id.toString() !== oldestScore._id.toString());
     }
-    
+
     const newScore = new Score({
       value: score,
       user: userId,
@@ -184,6 +184,47 @@ exports.getDailyScores = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des scores journaliers" });
   }
 };
+
+exports.completeQuiz = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, jwtSecret);
+    const userId = decodedToken.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json ({ error: "Utilisateur non trouvé"});
+    }
+
+    user.quizCompleted = true;
+
+    await user.save();
+
+    res.status(200).json({ message: 'Quiz complété', quizCompleted: user.quizCompleted });
+  } catch (error) {
+    res.status(500).json({ message: "Une erreur interne est survenue" });
+  }
+};
+
+exports.getCompletedQuizStatus = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, jwtSecret);
+    const userId = decodedToken.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    res.status(200).json({ quizCompleted: user.quizCompleted });
+  } catch (error) {
+    res.status(500).json({ message: "Une erreur interne est survenue" });
+  }
+};
+
 
 exports.sendResetPasswordEmail = async (req, res) => {
   try {

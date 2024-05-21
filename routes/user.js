@@ -15,4 +15,8 @@ router.get('/daily-leaderboard', userCtrl.getDailyScores);
 router.post('/reset-password-email', userCtrl.sendResetPasswordEmail);
 router.post('/reset-password', userCtrl.resetPassword);
 
+// routes pour mettre à jour et vérifier si l'utilisateur a déjà répondu à un quiz dans la journée
+router.post('/complete-quiz', userCtrl.completeQuiz);
+router.get('/complete-status', userCtrl.getCompletedQuizStatus);
+
 module.exports = router;

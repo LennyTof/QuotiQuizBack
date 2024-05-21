@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const config = require('./config');
 const cron = require('node-cron');
+const User = require('./models/user');
 const UsedQuiz = require('./models/usedQuiz');
 const DailyQuiz = require('./models/dailyQuiz');
 const Quiz = require('./models/quiz');
@@ -47,6 +48,8 @@ cron.schedule('0 0 * * *', async () => { // Exécute tous les jours à minuit
 
     // Supprime les quiz de la veille
     await DailyQuiz.deleteMany({});
+
+    await User.updateMany({}, { quizCompleted: false });
 
     // Récupère tous les IDs des quiz utilisés les 7 derniers jours
     const recentUsedQuizzes = await UsedQuiz.find({});
