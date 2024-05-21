@@ -4,9 +4,7 @@ const User = require('../models/user');
 
 //utilisé pour rajouter le champs role aux utilisateurs existants
 
-mongoose.connect(config.mongoURI,
-  { useNewUrlParser: true,
-    useUnifiedTopology: true })
+mongoose.connect(config.mongoURI)
   .then(() => {
     console.log('Connexion à MongoDB réussie !')
     addRoleToUsers();
@@ -16,8 +14,8 @@ mongoose.connect(config.mongoURI,
   const addRoleToUsers = async () => {
     try {
       const results = await User.updateMany(
-        { roles: { $exists: false } },
-        { $set: { roles: 'user' } }
+        { quizCompleted: { $exists: false } },
+        { $set: { quizCompleted: false } }
       );
       console.log('Update Results:', results);
       if (!results.acknowledged) {

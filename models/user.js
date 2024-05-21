@@ -8,7 +8,8 @@ const userSchema = mongoose.Schema({
   roles: { type: String, default: 'user'},
   scores: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Score'}],
   resetPasswordToken: { type: String, default: null },
-  resetPasswordExpires: { type: Date, default: null }
+  resetPasswordExpires: { type: Date, default: null },
+  quizCompleted: { type: Boolean, default: false }
 });
 
 userSchema.plugin(uniqueValidator);
