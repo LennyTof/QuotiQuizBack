@@ -22,17 +22,9 @@ mongoose.connect(config.mongoURI)
 
 app.use(helmet());
 
-// Configuration de CORS avec une seule URL autorisée
-const allowedOrigin = process.env.CORS_ORIGIN;
-
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (origin === allowedOrigin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: process.env.CORS_ORIGIN,
+  credentials: true,
 };
 
 app.use(cors(corsOptions));

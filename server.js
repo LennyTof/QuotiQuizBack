@@ -36,7 +36,6 @@ server.on('listening', () => {
 });
 
 server.listen(port);
-
 // En attente de la validation https
 
 // const options = {
