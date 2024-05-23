@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const userCtrl = require("../controllers/user");
+const auth = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 
 router.get('/', userCtrl.findAllUser);
 router.get('/profil', userCtrl.findOneUser);

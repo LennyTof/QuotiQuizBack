@@ -27,15 +27,6 @@ const errorHandler = error => {
   }
 };
 
-// En attente de la validation https
-
-// const options = {
-//   key: fs.readFileSync(path.join(__dirname, 'ssl', 'privateKey.key')),
-//   cert: fs.readFileSync(path.join(__dirname, 'ssl', 'certificate.crt'))
-// };
-
-// const server = https.createServer(options, app);
-
 const server = http.createServer(app);
 
 server.on('error', errorHandler);
@@ -45,3 +36,12 @@ server.on('listening', () => {
 });
 
 server.listen(port);
+
+// En attente de la validation https
+
+// const options = {
+//   key: fs.readFileSync(path.join(__dirname, 'ssl', 'privateKey.key')),
+//   cert: fs.readFileSync(path.join(__dirname, 'ssl', 'certificate.crt'))
+// };
+
+// const server = https.createServer(options, app);
