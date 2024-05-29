@@ -1,2 +1,2 @@
-web: npm ic
+web: npm ci
 web: node server.js
