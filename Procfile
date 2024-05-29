@@ -1,1 +1,1 @@
-web: npm ci
+web: npm ci node server.js
