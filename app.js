@@ -4,7 +4,6 @@ require('dotenv').config();
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const config = require('./config');
 const cron = require('node-cron');
 const User = require('./models/user');
 const UsedQuiz = require('./models/usedQuiz');
@@ -16,7 +15,7 @@ const moment = require('moment-timezone');
 const app = express();
 
 
-mongoose.connect(config.mongoURI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
