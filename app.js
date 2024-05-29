@@ -17,7 +17,10 @@ const app = express();
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+  .catch((error) => {
+    console.error(error)
+    console.log('Connexion à MongoDB échouée !')
+  });
 
 app.use(helmet());
 
