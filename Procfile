@@ -1,1 +1,1 @@
-web: npm ci node server.js
+web: ./start.sh
