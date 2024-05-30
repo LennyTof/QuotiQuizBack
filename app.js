@@ -42,7 +42,6 @@ mongoose.connect(mongoURI, options)
   .catch((error) => {
     console.error(error)
     console.log('Connexion à MongoDB échouée !')
-    process.exit(1);
   });
 
 app.use(helmet());
