@@ -11,38 +11,39 @@ const DailyQuiz = require('./models/dailyQuiz');
 const Quiz = require('./models/quiz');
 const quizRoutes = require('./routes/quiz');
 const userRoutes = require('./routes/user');
-const moment = require('moment-timezone');
-const HttpsProxyAgent = require('https-proxy-agent');
+const http = require('http');
 const url = require('url');
+const moment = require('moment-timezone');
 
 const app = express();
 
-const mongoURI = process.env.MONGO_URI;
-const options = {
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-  family: 4,
-};
 
-// Utiliser QuotaGuard en production
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log('Connexion à MongoDB réussie !'))
+.catch((error) => {
+  console.error(error)
+  console.log('Connexion à MongoDB échouée !')
+});
+
 if (process.env.QUOTAGUARDSTATIC_URL) {
   const proxy = url.parse(process.env.QUOTAGUARDSTATIC_URL);
-  const proxyOpts = {
+  const target = url.parse("http://ip.quotaguard.com/");
+
+  const options = {
     hostname: proxy.hostname,
     port: proxy.port || 80,
-    auth: proxy.auth,
+    path: target.href,
+    headers: {
+      "Proxy-Authorization": "Basic " + (new Buffer(proxy.auth).toString("base64")),
+      "Host": target.hostname
+    }
   };
 
-  const proxyAgent = new HttpsProxyAgent(proxyOpts);
-  options.agent = proxyAgent;
-}
-
-mongoose.connect(mongoURI, options)
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch((error) => {
-    console.error(error)
-    console.log('Connexion à MongoDB échouée !')
+  http.get(options, function(res) {
+    res.pipe(process.stdout);
+    return console.log("status code", res.statusCode);
   });
+}
 
 app.use(helmet());
 
