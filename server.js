@@ -1,11 +1,13 @@
 const http = require('http');
-const app = require('./app');
-const fs = require('fs');
 const https = require('https');
-const path = require('path');
+const { Agent } = require('https-proxy-agent');
+const url = require('url');
+const app = require('./app');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const normalizePort = val => parseInt(val, 10) || false;
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 const errorHandler = error => {
@@ -36,11 +38,33 @@ server.on('listening', () => {
 });
 
 server.listen(port);
-// En attente de la validation https
 
-// const options = {
-//   key: fs.readFileSync(path.join(__dirname, 'ssl', 'privateKey.key')),
-//   cert: fs.readFileSync(path.join(__dirname, 'ssl', 'certificate.crt'))
-// };
+// Configuration pour MongoDB
+const mongoURI = process.env.MONGO_URI;
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4,
+};
 
-// const server = https.createServer(options, app);
+// Utiliser QuotaGuard en production
+if (process.env.QUOTAGUARDSTATIC_URL) {
+  const proxy = url.parse(process.env.QUOTAGUARDSTATIC_URL);
+  const proxyOpts = {
+    hostname: proxy.hostname,
+    port: proxy.port || 80,
+    auth: proxy.auth,
+  };
+
+  const proxyAgent = new Agent(proxyOpts);
+  options.agent = proxyAgent;  // Utiliser le proxy agent pour les requêtes MongoDB
+}
+
+mongoose.connect(mongoURI, options)
+  .then(() => console.log('MongoDB connected...'))
+  .catch(err => {
+    console.error('Connexion à MongoDB échouée !', err);
+    process.exit(1);
+  });
