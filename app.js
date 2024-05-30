@@ -12,14 +12,39 @@ const Quiz = require('./models/quiz');
 const quizRoutes = require('./routes/quiz');
 const userRoutes = require('./routes/user');
 const moment = require('moment-timezone');
+const { Agent } = require('https-proxy-agent');
+const url = require('url');
+
 const app = express();
 
+const mongoURI = process.env.MONGO_URI;
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4,
+};
 
-mongoose.connect(process.env.MONGO_URI)
+// Utiliser QuotaGuard en production
+if (process.env.QUOTAGUARDSTATIC_URL) {
+  const proxy = url.parse(process.env.QUOTAGUARDSTATIC_URL);
+  const proxyOpts = {
+    hostname: proxy.hostname,
+    port: proxy.port || 80,
+    auth: proxy.auth,
+  };
+
+  const proxyAgent = new Agent(proxyOpts);
+  options.agent = proxyAgent;
+}
+
+mongoose.connect(mongoURI, options)
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch((error) => {
     console.error(error)
     console.log('Connexion à MongoDB échouée !')
+    process.exit(1);
   });
 
 app.use(helmet());
@@ -30,9 +55,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(morgan('combined'));
-
 app.use(express.json());
 
 
