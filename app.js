@@ -19,8 +19,6 @@ const app = express();
 
 const mongoURI = process.env.MONGO_URI;
 const options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
   family: 4,
