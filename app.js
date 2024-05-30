@@ -12,7 +12,7 @@ const Quiz = require('./models/quiz');
 const quizRoutes = require('./routes/quiz');
 const userRoutes = require('./routes/user');
 const moment = require('moment-timezone');
-const { Agent } = require('https-proxy-agent');
+const httpsProxyAgent = require('https-proxy-agent');
 const url = require('url');
 
 const app = express();
@@ -33,7 +33,7 @@ if (process.env.QUOTAGUARDSTATIC_URL) {
     auth: proxy.auth,
   };
 
-  const proxyAgent = new Agent(proxyOpts);
+  const proxyAgent = httpsProxyAgent(proxyOpts);
   options.agent = proxyAgent;
 }
 
