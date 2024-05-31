@@ -40,7 +40,7 @@ app.use('/api/user', userRoutes);
 
 moment.tz.setDefault('Europe/Paris')
 
-cron.schedule('49 13 * * *', async () => { // Exécute tous les jours à minuit
+cron.schedule('0 0 * * *', async () => { // Exécute tous les jours à minuit
   try {
     const today = moment().startOf('day');
 
