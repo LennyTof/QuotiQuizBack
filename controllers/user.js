@@ -6,37 +6,40 @@ const mailer = require('../config/mailer');
 const jwtSecret = process.env.JWT_SECRET;
 
 
-exports.signup = (req, res, next) => {
+exports.signup = async (req, res, next) => {
   const { password, passwordConfirmation, email, username } = req.body;
 
   if (!email || !username || !password || !passwordConfirmation) {
-    console.log("Champs non valide lors de la création du compte")
     return res.status(400).json({ message: "Tous les champs sont requis." });
   }
 
-  const isMatch = password === passwordConfirmation
+  if (password !== passwordConfirmation) {
+    return res.status(401).json({ message: 'Les mots de passe sont différents' });
+  }
 
-  if (isMatch) {
-    bcrypt.hash(req.body.password, 10)
-      .then(hash => {
-        const user = new User({
-          email: req.body.email,
-          username: req.body.username,
-          password: hash
-        });
-        user.save()
-          .then(() => res.status(201).json({ message: "utilisateur créé !" }))
-          .catch(error => {
-            console.log("Erreur lors de la sauvegarde du compte")
-            res.status(400).json({ error })
-          });
-      })
-      .catch(error => {
-        console.log("Erreur lors de la création du compte")
-        res.status(500).json({ message: "Une erreur interne est survenue" })
-      });
-  } else {
-    return res.status(401).json({ message: 'Les mot de passe sont différents'});
+  try {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: 'Cet email est déjà utilisé' });
+    }
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({ message: 'Ce pseudo est déjà utilisé' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      email,
+      username,
+      password: hashedPassword
+    });
+
+    await user.save();
+    res.status(201).json({ message: "Utilisateur créé !" });
+  } catch (error) {
+    console.error('Erreur lors de la création du compte:', error);
+    res.status(500).json({ message: "Une erreur interne est survenue" });
   }
 };
 
