@@ -10,6 +10,7 @@ exports.signup = (req, res, next) => {
   const { password, passwordConfirmation, email, username } = req.body;
 
   if (!email || !username || !password || !passwordConfirmation) {
+    console.log("Champs non valide lors de la création du compte")
     return res.status(400).json({ message: "Tous les champs sont requis." });
   }
 
@@ -25,9 +26,15 @@ exports.signup = (req, res, next) => {
         });
         user.save()
           .then(() => res.status(201).json({ message: "utilisateur créé !" }))
-          .catch(error => res.status(400).json({ error }));
+          .catch(error => {
+            console.log("Erreur lors de la sauvegarde du compte")
+            res.status(400).json({ error })
+          });
       })
-      .catch(error => res.status(500).json({ message: "Une erreur interne est survenue" }));
+      .catch(error => {
+        console.log("Erreur lors de la création du compte")
+        res.status(500).json({ message: "Une erreur interne est survenue" })
+      });
   } else {
     return res.status(401).json({ message: 'Les mot de passe sont différents'});
   }
