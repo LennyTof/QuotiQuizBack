@@ -40,12 +40,12 @@ app.use('/api/user', userRoutes);
 
 moment.tz.setDefault('Europe/Paris')
 
-cron.schedule('24 14 * * *', async () => { // Exécute tous les jours à minuit
+cron.schedule('26 14 * * *', async () => { // Exécute tous les jours à minuit
   try {
     const today = moment().startOf('day');
 
     // Supprime les quiz qui sont stockés depuis plus de 7 jours
-    await UsedQuiz.deleteMany({ date: { $lt: moment(today).subtract(7, 'days').toDate() } });
+    await UsedQuiz.deleteMany();
     console.log('Remise en ligne des quiz utilisés il y a plus de 7 jours')
 
     // Supprime les quiz de la veille
