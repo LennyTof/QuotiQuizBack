@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require('moment-timezone');
 
 const scoreSchema = mongoose.Schema({
   value: {
@@ -12,7 +13,7 @@ const scoreSchema = mongoose.Schema({
   },
   date: {
     type: Date,
-    default: Date.now
+    default: () => moment().tz('Europe/Paris').toDate()
   },
   quizDetails: [{
     question: String,

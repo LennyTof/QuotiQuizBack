@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Score = require('../models/score');
 const mailer = require('../config/mailer');
+const moment = require('moment-timezone');
 const jwtSecret = process.env.JWT_SECRET;
 
 
@@ -176,11 +177,8 @@ exports.saveUserScore = async (req, res, next) => {
 };
 
 exports.getDailyScores = async (req, res) => {
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999);
+  const startOfDay = moment().tz('Europe/Paris').startOf('day').toDate();
+  const endOfDay = moment().tz('Europe/Paris').endOf('day').toDate();
 
   try {
     const dailyScores = await Score.find({

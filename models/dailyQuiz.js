@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+const moment = require('moment-timezone');
 
 const dailyQuizSchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
     unique: true,
-    default: () => new Date().setHours(0, 0, 0, 0)
+    default: () => moment().tz('Europe/Paris').startOf('day').toDate()
   },
   quizIds: [{
     type: mongoose.Schema.Types.ObjectId,
