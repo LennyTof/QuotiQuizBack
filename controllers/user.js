@@ -256,7 +256,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
     await user.save()
 
     const mailOptions = {
-      from: process.env.BREVO_USER,
+      from: "QuotiQuiz",
       to: user.email,
       subject: 'Réinitialisation du mot de passe',
       text: `Ton code de réinitialisation est: ${otp} ! Utilise le vite avant qu'il expire sur QuotiQuiz !`
